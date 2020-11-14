@@ -1,7 +1,6 @@
-import 'package:faker/faker.dart';
+import 'package:example/views/draggable_sample.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_auto_scroll/flutter_auto_scroll.dart';
 
 void main() {
   runApp(MyApp());
@@ -22,116 +21,64 @@ class MyApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
-
   final String title;
+
+  const MyHomePage({
+    Key key,
+    this.title,
+  }) : super(key: key);
 
   @override
   _MyHomePageState createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  List<List<DraggableItem>> items;
-  final ScrollController scrollController = ScrollController();
-
-  @override
-  void initState() {
-    super.initState();
-    _refreshList();
-  }
-
-  void _refreshList() {
-    items = List.generate(
-      10,
-      (index) => List.generate(5, (index) => DraggableItem()),
-    );
-
-    if (mounted) setState(() {});
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
       ),
-      body: SafeArea(
-        child: LayoutBuilder(builder: (context, constraints) {
-          return Scrollbar(
-            child: ListView(
-              scrollDirection: Axis.horizontal,
-              controller: scrollController,
-              physics: const BouncingScrollPhysics(),
-              children: items
-                  .asMap()
-                  .map((key, value) {
-                    return MapEntry(
-                      key,
-                      Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: DragTarget<DraggableItem>(
-                          onWillAccept: (data) => true,
-                          onAccept: (item) {
-                            items
-                                .singleWhere(
-                                    (element) => element.any((x) => x == item))
-                                .remove(item);
-                            items[key].add(item);
-                            setState(() {});
-                          },
-                          builder: (context, candidates, rejectedDatum) =>
-                              Container(
-                            padding: const EdgeInsets.symmetric(vertical: 48),
-                            width: 300,
-                            height: 300,
-                            color: Colors.red,
-                            child: Wrap(
-                              children: value
-                                  .map((data) => Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: DraggableAutoScroll(
-                                          scrollDirection: Axis.horizontal,
-                                          constraints: constraints,
-                                          scrollController: scrollController,
-                                          child: Draggable<DraggableItem>(
-                                            maxSimultaneousDrags: 1,
-                                            feedback: Icon(Icons.access_time),
-                                            childWhenDragging:
-                                                const SizedBox.shrink(),
-                                            data: data,
-                                            child: Container(
-                                              padding: const EdgeInsets.all(16),
-                                              color: Colors.green,
-                                              child: Text(data.name),
-                                            ),
-                                          ),
-                                        ),
-                                      ))
-                                  .toList(),
-                            ),
-                          ),
-                        ),
-                      ),
-                    );
-                  })
-                  .values
-                  .toList(),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            RaisedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) {
+                      return DraggableSample(
+                        title: 'Horizontal Draggable Sample',
+                        scrollDirection: Axis.horizontal,
+                      );
+                    },
+                  ),
+                );
+              },
+              child: Text('Horizontal Draggable Sample'),
             ),
-          );
-        }),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _refreshList,
-        child: Icon(Icons.refresh),
+            RaisedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) {
+                      return DraggableSample(
+                        title: 'Vertical Draggable Sample',
+                        scrollDirection: Axis.vertical,
+                      );
+                    },
+                  ),
+                );
+              },
+              child: Text('Vertical Draggable Sample'),
+            ),
+          ],
+        ),
       ),
     );
   }
-}
-
-final faker = Faker();
-
-class DraggableItem {
-  final String name = faker.person.name();
-
-  DraggableItem();
 }
