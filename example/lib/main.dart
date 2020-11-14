@@ -55,63 +55,71 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         title: Text(widget.title),
       ),
-      body: LayoutBuilder(builder: (context, constraints) {
-        return ListView(
-          controller: scrollController,
-          children: items
-              .asMap()
-              .map((key, value) {
-                return MapEntry(
-                  key,
-                  Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: DragTarget<DraggableItem>(
-                      onWillAccept: (data) => true,
-                      onAccept: (item) {
-                        items
-                            .singleWhere(
-                                (element) => element.any((x) => x == item))
-                            .remove(item);
-                        items[key].add(item);
-                        setState(() {});
-                      },
-                      builder: (context, candidates, rejectedDatum) =>
-                          Container(
-                        padding: const EdgeInsets.symmetric(vertical: 48),
-                        width: double.infinity,
-                        height: 300,
-                        color: Colors.red,
-                        child: Wrap(
-                          children: value
-                              .map((data) => Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: DraggableAutoScroll(
-                                      constraints: constraints,
-                                      scrollController: scrollController,
-                                      child: Draggable<DraggableItem>(
-                                        feedback: Icon(Icons.access_time),
-                                        childWhenDragging:
-                                            const SizedBox.shrink(),
-                                        data: data,
-                                        child: Container(
-                                          padding: const EdgeInsets.all(16),
-                                          color: Colors.green,
-                                          child: Text(data.name),
+      body: SafeArea(
+        child: LayoutBuilder(builder: (context, constraints) {
+          return Scrollbar(
+            child: ListView(
+              scrollDirection: Axis.horizontal,
+              controller: scrollController,
+              physics: const BouncingScrollPhysics(),
+              children: items
+                  .asMap()
+                  .map((key, value) {
+                    return MapEntry(
+                      key,
+                      Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: DragTarget<DraggableItem>(
+                          onWillAccept: (data) => true,
+                          onAccept: (item) {
+                            items
+                                .singleWhere(
+                                    (element) => element.any((x) => x == item))
+                                .remove(item);
+                            items[key].add(item);
+                            setState(() {});
+                          },
+                          builder: (context, candidates, rejectedDatum) =>
+                              Container(
+                            padding: const EdgeInsets.symmetric(vertical: 48),
+                            width: 300,
+                            height: 300,
+                            color: Colors.red,
+                            child: Wrap(
+                              children: value
+                                  .map((data) => Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: DraggableAutoScroll(
+                                          scrollDirection: Axis.horizontal,
+                                          constraints: constraints,
+                                          scrollController: scrollController,
+                                          child: Draggable<DraggableItem>(
+                                            maxSimultaneousDrags: 1,
+                                            feedback: Icon(Icons.access_time),
+                                            childWhenDragging:
+                                                const SizedBox.shrink(),
+                                            data: data,
+                                            child: Container(
+                                              padding: const EdgeInsets.all(16),
+                                              color: Colors.green,
+                                              child: Text(data.name),
+                                            ),
+                                          ),
                                         ),
-                                      ),
-                                    ),
-                                  ))
-                              .toList(),
+                                      ))
+                                  .toList(),
+                            ),
+                          ),
                         ),
                       ),
-                    ),
-                  ),
-                );
-              })
-              .values
-              .toList(),
-        );
-      }),
+                    );
+                  })
+                  .values
+                  .toList(),
+            ),
+          );
+        }),
+      ),
       floatingActionButton: FloatingActionButton(
         onPressed: _refreshList,
         child: Icon(Icons.refresh),
